@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Batch Application Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        code {
+            display: block;
+            white-space: pre-wrap;
+            border: 1px solid #000;
+            padding: 10px;
+            background: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<h1>Overview</h1>
+<p>This Spring Batch Application is designed for processing a "User" entity. The main objective of batch processing here is reading users from a flat file, processing them, and writing them into a database. This is achieved via a configuration of various components like steps, tasks, and listeners that constitute a sequence of a batch job.</p>
+
+<h2>Components</h2>
+<h3>User Entity</h3>
+<code>
+    @Entity
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Table(name = "users")
+    public class User {
+    @Id
+    private Long userId;
+    private String userName;
+    private String userPassword;
+    }
+</code>
+
+<h3>UserRepository</h3>
+<code>
+    public interface UserRepository extends JpaRepository&lt;User, Long&gt; {
+    }
+</code>
+
+<h3>BatchConfig</h3>
+<p>This is the main configuration class for the Spring Batch job. It includes various beans that are part of the batch processing flow, including Job - the main batch process, composed of one or more Steps, Steps - a step is an independent, specific phase of the batch job, such as reading data, processing it, or writing it to a destination. ItemReader, ItemProcessor, and ItemWriter are parts of a step. JobCompletionNotificationListener is a custom listener to get notification when the job is completed.</p>
+
+<h3>JobCompletionNotificationListener</h3>
+<p>A listener class to log information after the job execution is completed. It prints out the users from the database when the job is complete.</p>
+
+<h2>Flow</h2>
+<p>
+    The batch job (importUserJob) is composed of a single-step (userProcessingStep). When the job is started:
+<ol>
+    <li>userProcessingStep is executed.
+        <ul>
+            <li>reader() reads user data from a flat file.</li>
+            <li>processor() processes the read data. This step is a pass-though.</li>
+            <li>writer() saves the processed users to the database.</li>
+        </ul>
+    </li>
+    <li>After the job is completed, JobCompletionNotificationListener.afterJob() is invoked, which logs all users in the database.</li>
+</ol>
+This application is designed to be efficient and able to process large amounts of user data concurrently.
+</p>
+</body>
+</html>
